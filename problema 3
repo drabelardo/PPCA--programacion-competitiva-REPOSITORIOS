@@ -1,0 +1,23 @@
+def generar_subconjuntos(arreglo):
+    n = len(arreglo)
+    total_subconjuntos = 2 ** n  # Calculamos el número total de subconjuntos usando la potencia de conjuntos
+    subconjuntos = []
+
+    # Iteramos a través de todos los números desde 0 hasta 2^n - 1 (inclusive)
+    for i in range(total_subconjuntos):
+        subconjunto = []  # Creamos un nuevo subconjunto vacío
+        # Para cada número, verificamos cada bit y si está encendido, agregamos el elemento correspondiente al subconjunto
+        for j in range(n):
+            if (i >> j) & 1:
+                subconjunto.append(arreglo[j])
+        subconjuntos.append(subconjunto)  # Agregamos el subconjunto generado a la lista de subconjuntos
+
+    return subconjuntos
+
+# Ejemplo de uso
+arreglo = [1, 2, 3]
+todos_subconjuntos = generar_subconjuntos(arreglo)
+
+# Mostrar los subconjuntos
+for subconjunto in todos_subconjuntos:
+    print(subconjunto)  # Imprimimos cada subconjunto generado

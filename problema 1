@@ -1,0 +1,24 @@
+def rotar_matriz(matriz):
+    n = len(matriz)
+    
+    # Transponer la matriz
+    for i in range(n):
+        for j in range(i+1, n):
+            matriz[i][j], matriz[j][i] = matriz[j][i], matriz[i][j]
+    
+    # Invertir las filas
+    for i in range(n):
+        matriz[i] = matriz[i][::-1]
+    
+    return matriz
+
+# Ejemplo de uso
+matriz = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+matriz_rotada = rotar_matriz(matriz)
+for fila in matriz_rotada:
+    print(fila)

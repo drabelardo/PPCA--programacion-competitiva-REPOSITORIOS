@@ -1,0 +1,33 @@
+def mostrar_matriz(matriz):
+    for fila in matriz:
+        print(fila)
+
+def rotar_matriz(matriz):
+    n = len(matriz)
+    
+    # Mostrar la matriz original
+    print("Matriz original:")
+    mostrar_matriz(matriz)
+    print()
+    
+    # Transponer la matriz
+    for i in range(n):
+        for j in range(i+1, n):
+            matriz[i][j], matriz[j][i] = matriz[j][i], matriz[i][j]
+    
+    # Invertir las filas
+    for i in range(n):
+        matriz[i] = matriz[i][::-1]
+    
+    # Mostrar la matriz rotada
+    print("\nMatriz rotada 90 grados en sentido horario:")
+    mostrar_matriz(matriz)
+
+# Ejemplo de uso
+matriz = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+rotar_matriz(matriz)

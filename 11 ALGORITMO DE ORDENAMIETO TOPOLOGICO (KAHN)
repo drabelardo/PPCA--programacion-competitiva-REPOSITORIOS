@@ -1,0 +1,36 @@
+#El Algoritmo de Kahn es un algoritmo utilizado para realizar un ordenamiento topológico en un grafo dirigido acíclico
+u -> v, el vértice u aparece antes que v en la secuencia.
+(DAG, por sus siglas en inglés). El ordenamiento topológico de un grafo es una secuencia lineal de sus vértices tal que para 
+cada arista 
+
+from collections import deque, defaultdict
+
+def kahn_topological_sort(vertices, edges):
+    in_degree = {v: 0 for v in vertices}  # Inicializar grados de entrada
+    graph = defaultdict(list)  # Inicializar el grafo
+
+    for u, v in edges:
+        graph[u].append(v)
+        in_degree[v] += 1
+
+    queue = deque([v for v in vertices if in_degree[v] == 0])  # Inicializar la cola
+    topological_order = []
+
+    while queue:
+        u = queue.popleft()
+        topological_order.append(u)
+
+        for v in graph[u]:
+            in_degree[v] -= 1
+            if in_degree[v] == 0:
+                queue.append(v)
+
+    if len(topological_order) == len(vertices):
+        return topological_order
+    else:
+        return "El grafo contiene ciclos y no se puede ordenar topológicamente."
+
+# Ejemplo de uso
+vertices = [1, 2, 3, 4]
+edges = [(1, 2), (1, 3), (2, 4), (3, 4)]
+print(kahn_topological_sort(vertices, edges))

@@ -1,0 +1,25 @@
+#include <iostream>
+using namespace std;
+
+int sumaDigitos(int numero) {
+    int suma = 0;
+    numero = abs(numero); // Asegurar que el número sea positivo
+
+    while (numero > 0) {
+        suma += numero % 10; // Suma el último dígito
+        numero /= 10;        // Elimina el último dígito
+    }
+
+    return suma;
+}
+
+int main() {
+    int numero;
+
+    cout << "Introduce un número entero: ";
+    cin >> numero;
+
+    cout << "La suma de los dígitos de " << numero << " es: " << sumaDigitos(numero) << endl;
+
+    return 0;
+}

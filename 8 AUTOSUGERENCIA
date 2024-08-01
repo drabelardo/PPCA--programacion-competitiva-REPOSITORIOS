@@ -1,0 +1,261 @@
+
+_________________________________________________________
+Index.html
+_________________________________________________________
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Código con Sugerencias</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Editor de Código con Sugerencias</h1>
+    <div id="editor" contenteditable="true"></div>
+    <div id="suggestions" class="suggestions-container"></div>
+
+    <script src="trie.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
+_________________________________________________________________
+main.js
+_________________________________________________________________
+document.addEventListener('DOMContentLoaded', () => {
+    const editor = document.getElementById('editor');
+    const suggestionsContainer = document.getElementById('suggestions');
+    let currentIndex = -1;
+
+    editor.addEventListener('input', () => {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const prefix = getPrefix(range);
+
+        if (prefix.length > 0) {
+            const suggestions = trie.autoSuggestions(prefix);
+            showSuggestions(suggestions, range);
+        } else {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+
+    editor.addEventListener('keydown', (e) => {
+        const suggestions = suggestionsContainer.children;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (currentIndex < suggestions.length - 1) {
+                currentIndex++;
+                updateActiveSuggestion();
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateActiveSuggestion();
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (currentIndex >= 0 && currentIndex < suggestions.length) {
+                insertSuggestion(suggestions[currentIndex].textContent);
+                suggestionsContainer.style.display = 'none';
+                currentIndex = -1;
+            } else {
+                insertSuggestion('\n');
+            }
+        }
+    });
+
+    editor.addEventListener('click', () => {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const prefix = getPrefix(range);
+
+        if (prefix.length > 0) {
+            const suggestions = trie.autoSuggestions(prefix);
+            showSuggestions(suggestions, range);
+        } else {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+
+    function getPrefix(range) {
+        const text = range.startContainer.textContent;
+        const beforeCursor = text.slice(0, range.startOffset);
+        const match = beforeCursor.match(/\b\w+$/);
+        return match ? match[0] : '';
+    }
+
+    function showSuggestions(suggestions, range) {
+        suggestionsContainer.innerHTML = '';
+        const rect = range.getBoundingClientRect();
+        suggestionsContainer.style.top = `${rect.bottom + window.scrollY}px`;
+        suggestionsContainer.style.left = `${rect.left + window.scrollX}px`;
+        suggestionsContainer.style.display = 'block';
+
+        for (let suggestion of suggestions) {
+            const div = document.createElement('div');
+            div.textContent = suggestion;
+            div.className = 'suggestion';
+            div.addEventListener('click', () => {
+                insertSuggestion(suggestion);
+                suggestionsContainer.style.display = 'none';
+                currentIndex = -1;
+            });
+            suggestionsContainer.appendChild(div);
+        }
+    }
+
+    function insertSuggestion(suggestion) {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const textNode = range.startContainer;
+        const prefixLength = getPrefix(range).length;
+        const beforeCursor = textNode.textContent.slice(0, range.startOffset - prefixLength);
+        const afterCursor = textNode.textContent.slice(range.startOffset);
+        textNode.textContent = beforeCursor + suggestion + afterCursor;
+        range.setStart(textNode, beforeCursor.length + suggestion.length);
+        range.setEnd(textNode, beforeCursor.length + suggestion.length);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    function updateActiveSuggestion() {
+        const suggestions = suggestionsContainer.children;
+        for (let i = 0; i < suggestions.length; i++) {
+            if (i === currentIndex) {
+                suggestions[i].classList.add('active');
+            } else {
+                suggestions[i].classList.remove('active');
+            }
+        }
+    }
+});
+________________________________________________________________________________
+styles.css
+________________________________________________________________________________
+body {
+   
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    margin: 20px 0;
+}
+
+#editor {
+    width: 80%;
+    height: 70vh;
+    border: 1px solid #ccc;
+    padding: 10px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 16px;
+    position: relative;
+}
+
+.suggestions-container {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    max-width: 300px;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.suggestion {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.suggestion:hover, .suggestion.active {
+    background-color: #f0f0f0;
+}
+________________________________________________________________________
+trie.js
+__________________________________________________________________________
+class TrieNode {
+    constructor() {
+        this.children = {};
+        this.isEndOfWord = false;
+    }
+}
+
+class Trie {
+    constructor() {
+        this.root = new TrieNode();
+    }
+
+    insert(word) {
+        let node = this.root;
+        for (let char of word) {
+            if (!node.children[char]) {
+                node.children[char] = new TrieNode();
+            }
+            node = node.children[char];
+        }
+        node.isEndOfWord = true;
+    }
+
+    search(word) {
+        let node = this.root;
+        for (let char of word) {
+            if (!node.children[char]) {
+                return false;
+            }
+            node = node.children[char];
+        }
+        return node.isEndOfWord;
+    }
+
+    startsWith(prefix) {
+        let node = this.root;
+        for (let char of prefix) {
+            if (!node.children[char]) {
+                return false;
+            }
+            node = node.children[char];
+        }
+        return true;
+    }
+
+    autoSuggestions(prefix) {
+        let node = this.root;
+        let results = [];
+
+        for (let char of prefix) {
+            if (!node.children[char]) {
+                return results;
+            }
+            node = node.children[char];
+        }
+
+        this._dfs(node, prefix, results);
+        return results;
+    }
+
+    _dfs(node, prefix, results) {
+        if (node.isEndOfWord) {
+            results.push(prefix);
+        }
+        for (let char in node.children) {
+            this._dfs(node.children[char], prefix + char, results);
+        }
+    }
+}
+
+let trie = new Trie();
+let words = ["hola", "holanda", "hondo", "honor", "hoja", "hogar", "hombre", "hello", "house", "how", "humble", "hero", "honey"];
+
+for (let word of words) {
+    trie.insert(word);
+}

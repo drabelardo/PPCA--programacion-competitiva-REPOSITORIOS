@@ -1,0 +1,70 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+vector<int> ordenacionTopologicaKahn(int n, const vector<vector<int>>& grafo) {
+    vector<int> gradoEntrada(n, 0);
+    vector<int> resultado;
+    queue<int> q;
+
+    // Calcular el grado de entrada de cada vértice
+    for (const auto& adyacentes : grafo) {
+        for (int vecino : adyacentes) {
+            gradoEntrada[vecino]++;
+        }
+    }
+
+    // Encolar todos los vértices con grado de entrada cero
+    for (int i = 0; i < n; ++i) {
+        if (gradoEntrada[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    // Procesar la cola
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        resultado.push_back(u);
+
+        for (int v : grafo[u]) {
+            if (--gradoEntrada[v] == 0) {
+                q.push(v);
+            }
+        }
+    }
+
+    if (resultado.size() != n) {
+        cerr << "El grafo no es un DAG." << endl;
+        return {}; // Ciclo detectado
+    }
+
+    return resultado;
+}
+
+int main() {
+    int n, m;
+    cout << "Introduce el número de vértices y aristas: ";
+    cin >> n >> m;
+
+    vector<vector<int>> grafo(n);
+    cout << "Introduce las aristas (u v) donde hay una arista de u a v:" << endl;
+    for (int i = 0; i < m; ++i) {
+        int u, v;
+        cin >> u >> v;
+        grafo[u].push_back(v);
+    }
+
+    vector<int> orden = ordenacionTopologicaKahn(n, grafo);
+
+    if (!orden.empty()) {
+        cout << "Ordenación topológica:" << endl;
+        for (int vertice : orden) {
+            cout << vertice << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}

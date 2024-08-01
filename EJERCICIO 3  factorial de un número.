@@ -1,0 +1,21 @@
+#include <iostream>
+using namespace std;
+
+unsigned long long factorial(int n) {
+    return (n <= 1) ? 1 : n * factorial(n - 1);
+}
+
+int main() {
+    int numero;
+
+    cout << "Introduce un número entero no negativo: ";
+    cin >> numero;
+
+    if (numero < 0) {
+        cout << "El factorial no está definido para números negativos." << endl;
+    } else {
+        cout << "El factorial de " << numero << " es: " << factorial(numero) << endl;
+    }
+
+    return 0;
+}

@@ -1,0 +1,66 @@
+/·  Dado un arreglo de enteros, hallar el producto máximo de 3 numero diferentes.
+
+#include <iostream>
+#include <vector>
+#include <limits>
+using namespace std;
+
+int productoMaximoDeTres(const vector<int>& nums) {
+    int max1 = numeric_limits<int>::min();
+    int max2 = numeric_limits<int>::min();
+    int max3 = numeric_limits<int>::min();
+    int min1 = numeric_limits<int>::max();
+    int min2 = numeric_limits<int>::max();
+
+    for (int num : nums) {
+        // Encontrar los tres números más grandes
+        if (num > max1) {
+            max3 = max2;
+            max2 = max1;
+            max1 = num;
+        } else if (num > max2) {
+            max3 = max2;
+            max2 = num;
+        } else if (num > max3) {
+            max3 = num;
+        }
+
+        // Encontrar los dos números más pequeños
+        if (num < min1) {
+            min2 = min1;
+            min1 = num;
+        } else if (num < min2) {
+            min2 = num;
+        }
+    }
+
+    // Producto máximo de tres números
+    int productoMax1 = max1 * max2 * max3;
+    int productoMax2 = min1 * min2 * max1;
+
+    return max(productoMax1, productoMax2);
+}
+
+int main() {
+    vector<int> nums;
+    int n, temp;
+
+    cout << "Introduce la cantidad de números en el arreglo: ";
+    cin >> n;
+
+    cout << "Introduce los números: ";
+    for (int i = 0; i < n; ++i) {
+        cin >> temp;
+        nums.push_back(temp);
+    }
+
+    if (nums.size() < 3) {
+        cout << "El arreglo debe contener al menos tres números." << endl;
+        return 1;
+    }
+
+    int resultado = productoMaximoDeTres(nums);
+    cout << "El producto máximo de tres números diferentes es: " << resultado << endl;
+
+    return 0;
+}

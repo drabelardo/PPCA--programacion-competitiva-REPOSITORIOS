@@ -1,0 +1,49 @@
+# dado un arreglo de enteros hallar el producto maximo de 3 numeros diferentes
+-entrada catidad de numero                                                                                                                           
+-los numeros separados por espacios                                                                                                       
+-como salida el producto maximo de 3 numeros 
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <climits>
+
+int maxProductOfThree(const std::vector<int>& nums) {
+    if (nums.size() < 3) {
+        std::cerr << "Error: Se necesitan al menos 3 números." << std::endl;
+        return INT_MIN; // o algún otro valor de error
+    }
+    
+    int n = nums.size();
+    // Ordenamos el vector
+    std::vector<int> sortedNums = nums;
+    std::sort(sortedNums.begin(), sortedNums.end());
+    
+    // Producto de los tres números más grandes
+    int max1 = sortedNums[n-1] * sortedNums[n-2] * sortedNums[n-3];
+    
+    // Producto de los dos números más pequeños y el más grande
+    int max2 = sortedNums[0] * sortedNums[1] * sortedNums[n-1];
+    
+    // Retornamos el máximo de los dos productos
+    return std::max(max1, max2);
+}
+
+int main() {
+    int n;
+    std::cout << "Ingresa la cantidad de números: ";
+    std::cin >> n;
+
+    std::vector<int> nums(n);
+    std::cout << "Ingresa los números separados por espacios: ";
+    for (int i = 0; i < n; ++i) {
+        std::cin >> nums[i];
+    }
+
+    int result = maxProductOfThree(nums);
+    if (result != INT_MIN) {
+        std::cout << "El producto máximo de tres números es: " << result << std::endl;
+    }
+
+    return 0;
+}

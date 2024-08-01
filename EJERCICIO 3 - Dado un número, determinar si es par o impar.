@@ -1,0 +1,8 @@
+#include <iostream>
+
+int main() {
+    int numero;
+    std::cin >> numero;
+    std::cout << (numero % 2 == 0 ? "Par" : "Impar") << std::endl;
+    return 0;
+}

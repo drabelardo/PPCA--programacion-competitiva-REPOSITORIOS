@@ -1,0 +1,15 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b, c;
+
+    cout << "Introduce tres números enteros separados por espacios: ";
+    cin >> a >> b >> c;
+
+    int mayor = (a > b) ? (a > c ? a : c) : (b > c ? b : c);
+
+    cout << "El mayor de los tres números es: " << mayor << endl;
+
+    return 0;
+}

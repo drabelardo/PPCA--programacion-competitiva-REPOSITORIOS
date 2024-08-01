@@ -1,0 +1,32 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// Función para resolver el problema de la mochila usando programación dinámica
+int knapsack(int budget, vector<int>& costs, vector<int>& coverages, int n) {
+    vector<vector<int>> K(n + 1, vector<int>(budget + 1, 0));
+
+    for (int i = 0; i <= n; i++) {
+        for (int w = 0; w <= budget; w++) {
+            if (i == 0 || w == 0)
+                K[i][w] = 0;
+            else if (costs[i - 1] <= w)
+                K[i][w] = max(coverages[i - 1] + K[i - 1][w - costs[i - 1]], K[i - 1][w]);
+            else
+                K[i][w] = K[i - 1][w];
+        }
+    }
+
+    return K[n][budget];
+}
+
+int main() {
+    int budget = 50; // Presupuesto total
+    vector<int> costs = {10, 20, 30}; // Costes de los sensores
+    vector<int> coverages = {60, 100, 120}; // Cobertura de los sensores
+    int n = coverages.size(); // Número de sensores
+
+    cout << "La cobertura máxima que se puede obtener es " << knapsack(budget, costs, coverages, n) << endl;
+
+    return 0;
+}
